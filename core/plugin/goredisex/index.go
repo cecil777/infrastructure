@@ -2,9 +2,9 @@ package goredisex
 
 import (
 	"core/plugin/redisex"
-	"errors"
-	"github.com/go-redis/redis"
 	"time"
+
+	"github.com/go-redis/redis"
 )
 
 type redisi struct {
@@ -45,79 +45,40 @@ func (r *redisi) Get(str string) (string, error) {
 	return val.Result()
 }
 
-func (r *redisi) Set(key, val string, arg ...interface{}) (bool, error) {
-	client := r.getClient()
-
-	if len(arg) == 1 {
-		if arg[0] == "NX" {
-			res := client.SetNX(key, val, 0)
-			return res.Result()
-		} else if arg[0] == "XX" {
-			res := client.SetXX(key, val, 0)
-			return res.Result()
+func (r *redisi) Set(key, value string, extraArgs ...interface{}) (ok bool, err error) {
+	var res string
+	if len(extraArgs) == 0 {
+		res, err = r.client.Set(key, value, 0).Result()
+		ok = res == "OK"
+	} else if len(extraArgs) == 1 {
+		if extraArgs[0] == "nx" {
+			ok, err = r.client.SetNX(key, value, 0).Result()
 		} else {
-			return false, errors.New("参数错误")
+			ok, err = r.client.SetXX(key, value, 0).Result()
 		}
-	} else if len(arg) == 2 {
-		if arg[0] == "EX" {
-			s, ok := arg[1].(int)
-			if ok {
-				res := client.Set(key, val, time.Duration(s*1000000000))
-				if res.Val() != "" {
-					return true, res.Err()
-				}
-				return false, res.Err()
-			}
-		} else if arg[0] == "PX" {
-			s, ok := arg[1].(int)
-			if ok {
-				res := client.Set(key, val, time.Duration(s*1000000))
-				if res.Val() != "" {
-					return true, res.Err()
-				}
-				return false, res.Err()
-			}
+	} else if len(extraArgs) == 2 {
+		res, err = r.client.Set(
+			key,
+			value,
+			extraArgs[1].(time.Duration),
+		).Result()
+		ok = res == "OK"
+	} else {
+		if extraArgs[2] == "nx" {
+			ok, err = r.client.SetNX(
+				key,
+				value,
+				extraArgs[1].(time.Duration),
+			).Result()
 		} else {
-			return false, errors.New("参数错误")
+			ok, err = r.client.SetXX(
+				key,
+				value,
+				extraArgs[1].(time.Duration),
+			).Result()
 		}
-	} else if len(arg) == 3 {
-		if arg[2] == "NX" {
-			s, ok := arg[1].(int)
-			if ok {
-				if arg[0] == "EX" {
-					res := client.SetNX(key, val, time.Duration(s*1000000000))
-					return res.Result()
-				} else if arg[0] == "PX" {
-					res := client.SetNX(key, val, time.Duration(s*1000000))
-					return res.Result()
-				} else {
-					return false, errors.New("参数错误")
-				}
-			}
-		} else if arg[2] == "XX" {
-			s, ok := arg[1].(int)
-			if ok {
-				if arg[0] == "EX" {
-					res := client.SetXX(key, val, time.Duration(s*1000000000))
-					return res.Result()
-				} else if arg[0] == "PX" {
-					res := client.SetXX(key, val, time.Duration(s*1000000))
-					return res.Result()
-				} else {
-					return false, errors.New("参数错误")
-				}
-			}
-		} else {
-			return false, errors.New("参数错误")
-		}
-	} else if len(arg) == 0 {
-		res := client.Set(key, val, 0)
-		if res.Val() != "" {
-			return true, res.Err()
-		}
-		return false, res.Err()
 	}
-	return false, errors.New("参数错误")
+	return
 }
 
 func (r *redisi) Time() (time.Time, error) {

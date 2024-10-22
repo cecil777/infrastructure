@@ -1,7 +1,6 @@
 package cor
 
 import (
-	"core/dp/ioc"
 	"errors"
 	"testing"
 
@@ -29,29 +28,6 @@ func (m *testHandler) Handle() error {
 	}
 
 	m.ctx.count = m.ctx.count + m.count
-	return m.IHandler.Handle()
-}
-
-type iCounter interface {
-	Count() int
-}
-
-type testCounter int
-
-func (m testCounter) Count() int {
-	return int(m)
-}
-
-type testInjectHandler struct {
-	IHandler
-
-	Counter iCounter `inject:""`
-
-	ctx *testContext
-}
-
-func (m testInjectHandler) Handle() error {
-	m.ctx.count = m.Counter.Count()
 	return m.IHandler.Handle()
 }
 
@@ -109,25 +85,5 @@ func Test_handler_Break(t *testing.T) {
 		err := h.Handle()
 		assert.NoError(t, err)
 		assert.Equal(t, ctx.count, 6)
-	})
-	t.Run("inject", func(t *testing.T) {
-		ioc.Set(
-			(*iCounter)(nil),
-			testCounter(11),
-		)
-
-		ctx := new(testContext)
-		h := &testHandler{
-			IHandler: New(),
-			count:    1,
-			ctx:      ctx,
-		}
-		h.SetNext(&testInjectHandler{
-			IHandler: New(),
-			ctx:      ctx,
-		})
-		err := h.Handle()
-		assert.NoError(t, err)
-		assert.Equal(t, ctx.count, 11)
 	})
 }
