@@ -1,26 +1,68 @@
 package api
 
 import (
-	"github.com/stretchr/testify/assert"
 	"go/ast"
+	"io/ioutil"
+	"log"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
+func createTempFile() {
+	err := os.MkdirAll("api/open", os.ModePerm)
+	if err != nil {
+		log.Panic(err)
+	}
+	err = ioutil.WriteFile("api/open/deploy.go", []byte(`package open
+
+type Deploy struct {
+}
+
+func (m Deploy) Call() (interface{}, error) {
+	return nil, nil
+}`), os.ModePerm)
+	if err != nil {
+		log.Panic(err)
+	}
+
+}
 func TestGenerateRegistry(t *testing.T) {
+	createTempFile()
+
 	t.Run("TestGenerateRegistry", func(t *testing.T) {
-		os.Mkdir("api", os.ModePerm)
-		GenerateRegistry()
-		_, err := os.Stat("api/metadata.go")
-		if err != nil {
-			assert.Error(t, err, "没有找到api/metadata.go文件，GenerateRegistry执行失败")
-		}
-		os.RemoveAll("api")
+		err := GenerateRegistry()
+
+		assert.NoError(t, err, "执行GenerateRegistry()出错")
+
+		b, err := ioutil.ReadFile("api/metadata.go")
+
+		assert.NoError(t, err, "没有找到api/metadata.go文件，GenerateRegistry执行失败")
+
+		actual := `package api
+import (
+    "gitlab.dev.daaokeji.com/infrastructure/core/api"
+    
+    "gitlab.dev.daaokeji.com/infrastructure/core/api/api/open"
+)
+
+func init() {
+	api.Register("open", "deploy", open.Deploy{})
+    
+}
+`
+
+		assert.Equal(t, string(b), actual)
 
 	})
+
+	assert.NoError(t, os.RemoveAll("api"))
+
 }
 
 func Test_projectApiPath(t *testing.T) {
+
 	type args struct {
 		wd     string
 		gopath string
@@ -50,6 +92,7 @@ func Test_projectApiPath(t *testing.T) {
 }
 
 func Test_parseGoFile(t *testing.T) {
+
 	type args struct {
 		endpoint   string
 		goFileName string
@@ -79,8 +122,11 @@ func Test_parseGoFile(t *testing.T) {
 }
 
 func Test_writeGoFile(t *testing.T) {
+	createTempFile()
+
 	type args struct {
-		list []metadata
+		list   []metadata
+		actual string
 	}
 	tests := []struct {
 		name string
@@ -92,13 +138,33 @@ func Test_writeGoFile(t *testing.T) {
 				Name:     "deploy",
 				RegName:  "DeployStruct",
 			},
-		}}},
+		},
+			actual: `package api
+import (
+    "gitlab.dev.daaokeji.com/infrastructure/core/api"
+    
+    "gitlab.dev.daaokeji.com/infrastructure/core/api/api/open"
+)
+
+func init() {
+	api.Register("open", "deploy", open.DeployStruct{})
+    
+}
+`,
+		}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Mkdir("api", os.ModePerm)
-			writeGoFile(tt.args.list)
-			os.RemoveAll("api")
+			err := writeGoFile(tt.args.list)
+			assert.NoErrorf(t, err, "写入api/metadata.go出错")
+
+			b, err := ioutil.ReadFile("api/metadata.go")
+
+			assert.NoErrorf(t, err, "没有找到api/metadata.go文件，writeGoFile执行失败")
+
+			assert.Equal(t, string(b), tt.args.actual)
 		})
 	}
+
+	assert.NoError(t, os.RemoveAll("api"))
 }
