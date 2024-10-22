@@ -1,9 +1,10 @@
-package gorm
+package gormex
 
 import (
 	"core/db"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/utils/tests"
 	"log"
 )
 
@@ -18,9 +19,17 @@ func NewFactory(dns string) db.IFactory {
 
 func (s *gormExFactory) getDb() (*gorm.DB, error) {
 	if s.db == nil {
-		d, err := gorm.Open(mysql.Open(s.dns), &gorm.Config{})
+		var d *gorm.DB
+		var err error
+		if s.dns != "" {
+			d, err = gorm.Open(mysql.Open(s.dns), &gorm.Config{})
+		} else {
+			d, err = gorm.Open(tests.DummyDialector{}, nil)
+		}
+
 		if err != nil {
 			log.Fatal(err)
+			return nil, err
 		}
 		s.db = d
 	}

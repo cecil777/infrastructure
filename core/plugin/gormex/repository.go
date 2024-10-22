@@ -1,4 +1,4 @@
-package gorm
+package gormex
 
 import (
 	"core/db"

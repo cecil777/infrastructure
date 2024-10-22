@@ -1,4 +1,4 @@
-package gorm
+package gormex
 
 import (
 	"core/db"
@@ -36,21 +36,21 @@ func (q query) OrderByDesc(fields ...string) db.IQuery {
 }
 
 func (q query) Skip(v int) db.IQuery {
-	q.db.Offset(v)
+	q.db = q.db.Offset(v)
 	return q
 }
 
 func (q query) Take(v int) db.IQuery {
-	q.db.Limit(v)
+	q.db = q.db.Limit(v)
 	return q
 }
 
 func (q query) ToArray(dst interface{}) error {
-	q.db.Find(dst)
+	q.db = q.db.Find(dst)
 	return nil
 }
 
 func (q query) Where(args ...interface{}) db.IQuery {
-	q.db.Where(args)
+	q.db = q.db.Where(args)
 	return q
 }
