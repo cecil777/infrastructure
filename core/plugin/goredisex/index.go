@@ -2,100 +2,115 @@ package goredisex
 
 import (
 	"core/plugin/redisex"
-	"time"
-
 	"github.com/go-redis/redis"
+	"time"
 )
 
-type redisi struct {
+type redisAdapter struct {
 	host     string
 	password string
 	client   *redis.Client
 }
 
-func (r *redisi) Close() error {
-	client := r.getClient()
-	err := client.Close()
+func (r *redisAdapter) Close() error {
 
-	return err
+	return r.getClient().Close()
 }
 
-func (r *redisi) Del(arg ...string) (int, error) {
-	client := r.getClient()
-	del := client.Del(arg...)
+func (r *redisAdapter) Del(arg ...string) (int, error) {
+	del := r.getClient().Del(arg...)
 
 	return int(del.Val()), del.Err()
 }
 
-func (r *redisi) Exists(str string) (bool, error) {
-	client := r.getClient()
-	res := client.Exists(str)
+func (r *redisAdapter) Exists(str string) (bool, error) {
+	res := r.getClient().Exists(str)
 
-	if res.Val() == 1 {
-		return true, res.Err()
-	}
-
-	return false, res.Err()
+	return res.Val() == 1, res.Err()
 }
 
-func (r *redisi) Get(str string) (string, error) {
-	client := r.getClient()
-	val := client.Get(str)
+func (r *redisAdapter) Get(str string) (string, error) {
 
-	return val.Result()
+	return r.getClient().Get(str).Result()
 }
 
-func (r *redisi) Set(key, value string, extraArgs ...interface{}) (ok bool, err error) {
+func (r *redisAdapter) Set(key, value string, extraArgs ...interface{}) (ok bool, err error) {
 	var res string
 	if len(extraArgs) == 0 {
-		res, err = r.client.Set(key, value, 0).Result()
+		res, err = r.getClient().Set(key, value, 0).Result()
 		ok = res == "OK"
 	} else if len(extraArgs) == 1 {
 		if extraArgs[0] == "nx" {
-			ok, err = r.client.SetNX(key, value, 0).Result()
+			ok, err = r.getClient().SetNX(key, value, 0).Result()
+		} else if extraArgs[0] == "xx" {
+			ok, err = r.getClient().SetXX(key, value, 0).Result()
 		} else {
-			ok, err = r.client.SetXX(key, value, 0).Result()
+			panic("redis set 参数有误")
 		}
 	} else if len(extraArgs) == 2 {
-		res, err = r.client.Set(
-			key,
-			value,
-			extraArgs[1].(time.Duration),
-		).Result()
-		ok = res == "OK"
-	} else {
-		if extraArgs[2] == "nx" {
-			ok, err = r.client.SetNX(
+		s, okk := extraArgs[1].(int)
+		if okk {
+			if extraArgs[0] == "ex" {
+				s = s * 1000 * 1000 * 1000
+			} else if extraArgs[0] == "px" {
+				s = s * 1000 * 1000
+			} else {
+				panic("redis set 参数有误")
+			}
+			res, err = r.getClient().Set(
 				key,
 				value,
-				extraArgs[1].(time.Duration),
+				time.Duration(s),
 			).Result()
+			ok = res == "OK"
 		} else {
-			ok, err = r.client.SetXX(
-				key,
-				value,
-				extraArgs[1].(time.Duration),
-			).Result()
+			panic("redis set 参数有误")
 		}
+	} else if len(extraArgs) == 3 {
+		s, okk := extraArgs[1].(int)
+		if okk {
+			if extraArgs[0] == "ex" {
+				s = s * 1000 * 1000 * 1000
+			} else if extraArgs[1] == "px" {
+				s = s * 1000 * 1000
+			} else {
+				panic("redis set 参数有误")
+			}
+			if extraArgs[2] == "nx" {
+				ok, err = r.getClient().SetNX(
+					key,
+					value,
+					time.Duration(s),
+				).Result()
+			} else if extraArgs[2] == "xx" {
+				ok, err = r.getClient().SetXX(
+					key,
+					value,
+					time.Duration(s),
+				).Result()
+			} else {
+				panic("redis set 参数有误")
+			}
+		} else {
+			panic("redis set 参数错误")
+		}
+	} else {
+		panic("redis set 参数过多")
 	}
 	return
 }
 
-func (r *redisi) Time() (time.Time, error) {
-	client := r.getClient()
-	res := client.Time()
+func (r *redisAdapter) Time() (time.Time, error) {
 
-	return res.Result()
+	return r.getClient().Time().Result()
 }
 
-func (r *redisi) TTL(key string) (time.Duration, error) {
-	client := r.getClient()
-	ttl := client.TTL(key)
+func (r *redisAdapter) TTL(key string) (time.Duration, error) {
 
-	return ttl.Result()
+	return r.getClient().TTL(key).Result()
 }
 
-func (r *redisi) getClient() redis.Client {
+func (r *redisAdapter) getClient() *redis.Client {
 	if r.client == nil {
 		r.client = redis.NewClient(&redis.Options{
 			Addr:     r.host,
@@ -103,13 +118,12 @@ func (r *redisi) getClient() redis.Client {
 		})
 	}
 
-	return *r.client
+	return r.client
 }
 
 func NewRedis(host, password string) redisex.IRedis {
-	r := redisi{
+	return &redisAdapter{
 		host:     host,
 		password: password,
 	}
-	return &r
 }
