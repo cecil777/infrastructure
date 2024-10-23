@@ -7,13 +7,12 @@ import (
 )
 
 type query struct {
-	db    *gorm.DB
-	model interface{}
+	db *gorm.DB
 }
 
 func (q query) Count() (int64, error) {
 	var count int64
-	q.db.Model(q.model).Where(q.model).Count(&count)
+	q.db.Where(q.db.Statement.Model).Count(&count)
 	return count, nil
 }
 
@@ -46,7 +45,7 @@ func (q query) Take(v int) db.IQuery {
 }
 
 func (q query) ToArray(dst interface{}) error {
-	q.db = q.db.Find(dst)
+	q.db.Find(dst)
 	return nil
 }
 

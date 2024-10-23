@@ -13,10 +13,11 @@ type repository struct {
 }
 
 func (r repository) Query() db.IQuery {
-	return &query{
-		db:    r.db,
-		model: r.model,
+	q := &query{
+		db: r.db,
 	}
+	q.db = q.db.Model(r.model)
+	return q
 }
 
 func (r repository) Add(entry db.IIdentity) error {
