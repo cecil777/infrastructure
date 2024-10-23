@@ -2,7 +2,7 @@ package wechat
 
 import "testing"
 
-func TestWxWorkSend(t *testing.T) {
+func TestWebhook_Send(t *testing.T) {
 	type args struct {
 		url  string
 		text string
@@ -23,7 +23,7 @@ func TestWxWorkSend(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w := &Wxwork{}
+			w := &webhook{}
 			if err := w.Send(tt.args.url, tt.args.text); (err != nil) != tt.wantErr {
 				t.Errorf("Send() error = %v, wantErr %v", err, tt.wantErr)
 			}

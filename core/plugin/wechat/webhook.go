@@ -1,17 +1,11 @@
 package wechat
 
 import (
-	"core/runtimeex"
 	"encoding/json"
 	"errors"
 
 	"github.com/valyala/fasthttp"
 )
-
-var _ runtimeex.IWebhook = (*Wxwork)(nil)
-
-type Wxwork struct {
-}
 
 type SendTextBody struct {
 	MsgType string          `json:"msgtype"`
@@ -27,7 +21,14 @@ type SendTextResp struct {
 	Errmsg  string `json:"errmsg"`
 }
 
-func (w *Wxwork) Send(url string, text string) error {
+type webhook struct {
+}
+
+func NewWebhook() *webhook {
+	return &webhook{}
+}
+
+func (w *webhook) Send(url, text string) error {
 	textContent := SendTextContent{
 		Content: text,
 	}
@@ -51,10 +52,8 @@ func (w *Wxwork) Send(url string, text string) error {
 		return err
 	}
 
-	b := string(resp.Body())
-	str := []byte(b)
 	result := SendTextResp{}
-	err = json.Unmarshal(str, &result)
+	err = json.Unmarshal(resp.Body(), &result)
 	if err != nil {
 		return err
 	}
