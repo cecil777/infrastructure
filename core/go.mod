@@ -1,4 +1,4 @@
-module core
+module github.com/infrastructure/core
 
 go 1.23.1
 
