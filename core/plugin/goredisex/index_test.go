@@ -20,9 +20,7 @@ func Test_goRedis_Del(t *testing.T) {
 	key := "Test_goRedis_Del"
 	val := "test"
 	client.Set(key, val, 0).Result()
-
 	defer client.Del(key)
-
 	get, err := self.Get(key)
 	assert.Equal(t, get, val)
 	assert.Nil(t, err)
@@ -37,6 +35,7 @@ func Test_goRedis_SetXXNX(t *testing.T) {
 	key1 := "a"
 	val1 := "test1"
 	set, err := self.Set(key1, val1, "xx")
+	defer self.Del(key1)
 	assert.Equal(t, set, false)
 	assert.Nil(t, err)
 	get, err := self.Get(key1)
@@ -55,7 +54,6 @@ func Test_goRedis_SetXXNX(t *testing.T) {
 	get, err = self.Get(key1)
 	assert.Equal(t, get, val1)
 
-	self.Del(key1)
 }
 
 func Test_goRedis_SetEXPX(t *testing.T) {
@@ -83,13 +81,13 @@ func Test_goRedis_Exists(t *testing.T) {
 	val := "test4"
 
 	set, err := self.Set(key, val)
+	defer self.Del(key)
 	assert.Equal(t, set, true)
 	assert.Nil(t, err)
 	exists, err := self.Exists(key)
 	assert.Equal(t, exists, true)
 	assert.Nil(t, err)
 
-	self.Del(key)
 }
 
 func Test_goRedis_Time(t *testing.T) {
