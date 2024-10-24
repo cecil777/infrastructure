@@ -17,8 +17,8 @@ type sendTextContent struct {
 }
 
 type sendTextResp struct {
-	Errcode int    `json:"errcode"`
-	Errmsg  string `json:"errmsg"`
+	ErrCode int    `json:"errcode"`
+	ErrMsg  string `json:"errmsg"`
 }
 
 type webhook struct {
@@ -58,8 +58,8 @@ func (w *webhook) Send(url, text string) error {
 		return err
 	}
 
-	if result.Errcode != 0 {
-		return errors.New(result.Errmsg)
+	if result.ErrCode != 0 {
+		return errors.New(result.ErrMsg)
 	}
 	return nil
 }
