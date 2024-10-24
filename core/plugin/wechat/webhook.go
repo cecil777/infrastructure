@@ -9,14 +9,14 @@ import (
 
 type SendTextBody struct {
 	MsgType string          `json:"msgtype"`
-	Text    SendTextContent `json:"text"`
+	Text    sendTextContent `json:"text"`
 }
 
-type SendTextContent struct {
+type sendTextContent struct {
 	Content string `json:"content"`
 }
 
-type SendTextResp struct {
+type sendTextResp struct {
 	Errcode int    `json:"errcode"`
 	Errmsg  string `json:"errmsg"`
 }
@@ -24,12 +24,8 @@ type SendTextResp struct {
 type webhook struct {
 }
 
-func NewWebhook() *webhook {
-	return &webhook{}
-}
-
 func (w *webhook) Send(url, text string) error {
-	textContent := SendTextContent{
+	textContent := sendTextContent{
 		Content: text,
 	}
 	body := SendTextBody{
@@ -41,18 +37,22 @@ func (w *webhook) Send(url, text string) error {
 		return err
 	}
 
-	req := &fasthttp.Request{}
+	req := fasthttp.AcquireRequest()
+	defer fasthttp.ReleaseRequest(req)
+
 	req.SetRequestURI(url)
 	req.SetBody(jsonBody)
 	req.Header.SetContentType("application/json")
 	req.Header.SetMethod("POST")
-	resp := &fasthttp.Response{}
-	client := &fasthttp.Client{}
-	if err := client.Do(req, resp); err != nil {
+
+	resp := fasthttp.AcquireResponse()
+	defer fasthttp.ReleaseResponse(resp)
+
+	if err := fasthttp.Do(req, resp); err != nil {
 		return err
 	}
 
-	result := SendTextResp{}
+	result := sendTextResp{}
 	err = json.Unmarshal(resp.Body(), &result)
 	if err != nil {
 		return err
@@ -62,4 +62,8 @@ func (w *webhook) Send(url, text string) error {
 		return errors.New(result.Errmsg)
 	}
 	return nil
+}
+
+func NewWebhook() *webhook {
+	return &webhook{}
 }
