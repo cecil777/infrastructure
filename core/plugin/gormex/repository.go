@@ -9,41 +9,55 @@ import (
 type repository struct {
 	model interface{}
 	isTx  bool
-	db    *gorm.DB
+	proxy dbProxy
 	uow   *uowRepository
 }
 
 func (r repository) Query() db.IQuery {
 	q := &query{
-		db: r.db,
+		proxy: r.proxy,
 	}
-	q.db = q.db.Model(r.model)
+	q.actions = append(q.actions, func(db *gorm.DB) *gorm.DB {
+		return db.Model(r.model)
+	})
 	return q
 }
 
 func (r repository) Add(entry db.IIdentity) error {
 	if r.isTx {
-		r.uow.add = append(r.uow.add, entry)
+		r.uow.addQueue = append(r.uow.addQueue, entry)
 		return nil
 	}
-	err := r.db.Create(entry).Error
+	connDb, err := r.proxy.getDb()
+	if err != nil {
+		return err
+	}
+	err = connDb.Create(entry).Error
 	return err
 }
 
 func (r repository) Remove(entry db.IIdentity) error {
 	if r.isTx {
-		r.uow.remove = append(r.uow.remove, entry)
+		r.uow.removeQueue = append(r.uow.removeQueue, entry)
 		return nil
 	}
-	err := r.db.Delete(entry).Error
+	connDb, err := r.proxy.getDb()
+	if err != nil {
+		return err
+	}
+	err = connDb.Delete(entry).Error
 	return err
 }
 
 func (r repository) Save(entry db.IIdentity) error {
 	if r.isTx {
-		r.uow.save = append(r.uow.save, entry)
+		r.uow.saveQueue = append(r.uow.saveQueue, entry)
 		return nil
 	}
-	err := r.db.Save(entry).Error
+	connDb, err := r.proxy.getDb()
+	if err != nil {
+		return err
+	}
+	err = connDb.Save(entry).Error
 	return err
 }

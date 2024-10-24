@@ -2,11 +2,12 @@ package gormex
 
 import (
 	"fmt"
-	"gorm.io/gorm"
 	"strconv"
 	"time"
 
 	"github.com/cecil777/infrastructure/core/db"
+
+	"gorm.io/gorm"
 )
 
 type Test struct {
@@ -26,13 +27,14 @@ func (Test) TableName() string {
 }
 
 func NewMock() db.IFactory {
-	return NewFactory("root:123456@tcp(127.0.0.1:3306)/yddb?charset=utf8mb4&parseTime=True&loc=Local")
+	return NewFactory("root:root1234@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local")
 }
 
 func DeleteMockTest(conn db.IFactory) {
 	at := Test{}
 	factory := conn.(*gormExFactory)
-	factory.db.Where("1 = 1").Delete(&at)
+	d, _ := factory.proxy.getDb()
+	d.Where("1 = 1").Delete(&at)
 }
 
 func MultipleCreateTest(conn db.IFactory, name string) {

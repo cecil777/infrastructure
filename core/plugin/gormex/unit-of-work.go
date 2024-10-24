@@ -1,47 +1,47 @@
 package gormex
 
-import (
-	"gorm.io/gorm"
-)
-
 type uowRepository struct {
-	tx     *gorm.DB
-	add    []interface{}
-	save   []interface{}
-	remove []interface{}
+	proxy       dbProxy
+	addQueue    []interface{}
+	saveQueue   []interface{}
+	removeQueue []interface{}
 }
 
-func (u uowRepository) Commit() error {
-	if len(u.add) > 0 || len(u.remove) > 0 || len(u.save) > 0 {
-		tx := u.tx.Begin()
-		if len(u.add) > 0 {
-			for _, q := range u.add {
-				if err := tx.Create(q).Error; err != nil {
-					tx.Rollback()
-					return err
-				}
-			}
-		}
-		if len(u.remove) > 0 {
-			for _, q := range u.remove {
-				if err := tx.Delete(q).Error; err != nil {
-					tx.Rollback()
-					return err
-				}
-			}
-		}
-		if len(u.save) > 0 {
-			for _, q := range u.save {
-				if err := tx.Save(q).Error; err != nil {
-					tx.Rollback()
-					return err
-				}
-			}
-		}
-		err := tx.Commit().Error
+func (u uowRepository) Commit() (err error) {
+	if len(u.addQueue) > 0 || len(u.removeQueue) > 0 || len(u.saveQueue) > 0 {
+		db, err := u.proxy.getDb()
 		if err != nil {
 			return err
 		}
+
+		tx := db.Begin()
+		defer func() {
+			if err != nil {
+				tx.Rollback()
+			}
+		}()
+		if len(u.addQueue) > 0 {
+			for _, q := range u.addQueue {
+				if err = tx.Create(q).Error; err != nil {
+					return err
+				}
+			}
+		}
+		if len(u.removeQueue) > 0 {
+			for _, q := range u.removeQueue {
+				if err = tx.Delete(q).Error; err != nil {
+					return err
+				}
+			}
+		}
+		if len(u.saveQueue) > 0 {
+			for _, q := range u.saveQueue {
+				if err = tx.Save(q).Error; err != nil {
+					return err
+				}
+			}
+		}
+		err = tx.Commit().Error
 	}
 	return nil
 }

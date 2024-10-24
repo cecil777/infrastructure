@@ -3,14 +3,12 @@ package gormex
 import (
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestUnitOfWork(t *testing.T) {
-	ctl := gomock.NewController(t)
-	defer ctl.Finish()
 	conn := NewMock()
+	defer DeleteMockTest(conn)
 	//先添加2条测试数据
 	first := Test{}
 	c := conn.Db(first)
@@ -51,5 +49,4 @@ func TestUnitOfWork(t *testing.T) {
 	count, err := conn.Db(Test{}).Query().Count()
 	//断言匹配
 	assert.Equal(t, count, int64(2))
-	DeleteMockTest(conn)
 }

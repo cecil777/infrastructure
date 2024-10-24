@@ -3,13 +3,10 @@ package gormex
 import (
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRepositoryQuery(t *testing.T) {
-	ctl := gomock.NewController(t)
-	defer ctl.Finish()
 	test := Test{}
 	g := NewFactory("")
 	_, ok := g.Db(test).Query().(*query)
@@ -17,9 +14,8 @@ func TestRepositoryQuery(t *testing.T) {
 }
 
 func TestRepositoryAdd(t *testing.T) {
-	ctl := gomock.NewController(t)
-	defer ctl.Finish()
 	conn := NewMock()
+	defer DeleteMockTest(conn)
 	first := Test{}
 	c := conn.Db(first)
 	first.Name = "repository add test"
@@ -27,13 +23,11 @@ func TestRepositoryAdd(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEqual(t, first.ID, uint(0))
 	assert.Equal(t, first.Name, "repository add test")
-	DeleteMockTest(conn)
 }
 
 func TestRepositorySave(t *testing.T) {
-	ctl := gomock.NewController(t)
-	defer ctl.Finish()
 	conn := NewMock()
+	defer DeleteMockTest(conn)
 	first := Test{}
 	c := conn.Db(first)
 	first.Name = "repository save test"
@@ -42,13 +36,11 @@ func TestRepositorySave(t *testing.T) {
 	err = c.Save(&first)
 	assert.NoError(t, err)
 	assert.Equal(t, first.Name, "repository update test")
-	DeleteMockTest(conn)
 }
 
 func TestRepositoryRemove(t *testing.T) {
-	ctl := gomock.NewController(t)
-	defer ctl.Finish()
 	conn := NewMock()
+	defer DeleteMockTest(conn)
 	first := Test{}
 	c := conn.Db(first)
 	first.Name = "repository remove test"
@@ -57,13 +49,11 @@ func TestRepositoryRemove(t *testing.T) {
 	err = c.Remove(&first)
 	assert.NoError(t, err)
 	assert.True(t, first.DeletedAt.Valid)
-	DeleteMockTest(conn)
 }
 
 func TestUowRepositoryAdd(t *testing.T) {
-	ctl := gomock.NewController(t)
-	defer ctl.Finish()
 	conn := NewMock()
+	defer DeleteMockTest(conn)
 	first := Test{}
 	uow := conn.Uow()
 	c := conn.Db(first, uow)
@@ -77,13 +67,11 @@ func TestUowRepositoryAdd(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEqual(t, first.ID, uint(0))
 	assert.Equal(t, first.Name, "repository uow update test")
-	DeleteMockTest(conn)
 }
 
 func TestUowRepositorySave(t *testing.T) {
-	ctl := gomock.NewController(t)
-	defer ctl.Finish()
 	conn := NewMock()
+	defer DeleteMockTest(conn)
 	first := Test{}
 	c := conn.Db(first)
 	first.Name = "repository uow save test"
@@ -99,13 +87,11 @@ func TestUowRepositorySave(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, first.Name, "repository uow update test")
 	assert.NotEqual(t, first.UpdatedAt, updatedAt)
-	DeleteMockTest(conn)
 }
 
 func TestUowRepositoryRemove(t *testing.T) {
-	ctl := gomock.NewController(t)
-	defer ctl.Finish()
 	conn := NewMock()
+	defer DeleteMockTest(conn)
 	first := Test{}
 	uow := conn.Uow()
 	c := conn.Db(first, uow)
@@ -117,5 +103,4 @@ func TestUowRepositoryRemove(t *testing.T) {
 	err = uow.Commit()
 	assert.NoError(t, err)
 	assert.True(t, first.DeletedAt.Valid)
-	DeleteMockTest(conn)
 }
