@@ -1,7 +1,6 @@
 package osex
 
 import (
-	"core/ioex"
 	"encoding/json"
 	"fmt"
 	"gopkg.in/yaml.v3"
@@ -9,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+
+	"github.com/cecil777/infrastructure/core/ioex"
 )
 
 type ioFile struct {

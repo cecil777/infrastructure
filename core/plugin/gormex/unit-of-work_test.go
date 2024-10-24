@@ -1,9 +1,10 @@
 package gormex
 
 import (
+	"testing"
+
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestUnitOfWork(t *testing.T) {

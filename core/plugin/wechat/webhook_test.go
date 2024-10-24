@@ -13,7 +13,7 @@ func TestWebhook_Send(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "TestWxwork_Send",
+			name: "TestWebhook_Send",
 			args: args{
 				url:  "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=284cc574-7e21-4333-bb9f-6f87e0308529",
 				text: "企业微信机器人 hello world",

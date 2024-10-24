@@ -1,9 +1,10 @@
 package runtimeex
 
 import (
-	"core/api"
-	"core/errorex"
 	"reflect"
+
+	"github.com/cecil777/infrastructure/core/api"
+	"github.com/cecil777/infrastructure/core/errorex"
 )
 
 var invalidAPISingleton = new(invalidAPI)

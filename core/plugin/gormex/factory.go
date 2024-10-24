@@ -1,7 +1,7 @@
 package gormex
 
 import (
-	"core/db"
+	"github.com/cecil777/infrastructure/core/db"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/utils/tests"

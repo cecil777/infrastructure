@@ -1,6 +1,6 @@
 package osex
 
-import "core/ioex"
+import "github.com/cecil777/infrastructure/core/ioex"
 
 type ioFactory struct {
 	ioPath ioex.IPath

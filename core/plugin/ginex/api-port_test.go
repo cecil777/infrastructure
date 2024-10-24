@@ -1,12 +1,12 @@
 package ginex
 
 import (
-	"core/api"
 	"io/ioutil"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/cecil777/infrastructure/core/api"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,10 +1,10 @@
 package osex
 
 import (
-	"core/ioex"
 	"path/filepath"
 
 	"github.com/cecil777/go-underscore"
+	"github.com/cecil777/infrastructure/core/ioex"
 )
 
 type osPath struct{}

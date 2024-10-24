@@ -2,9 +2,10 @@ package gormex
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestQueryCount(t *testing.T) {

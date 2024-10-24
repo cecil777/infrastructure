@@ -1,11 +1,12 @@
 package gormex
 
 import (
-	"core/db"
 	"fmt"
 	"gorm.io/gorm"
 	"strconv"
 	"time"
+
+	"github.com/cecil777/infrastructure/core/db"
 )
 
 type Test struct {

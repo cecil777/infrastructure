@@ -1,11 +1,11 @@
 package osex
 
 import (
-	"core/ioex"
 	"io/ioutil"
 	"os"
 
 	"github.com/cecil777/go-underscore"
+	"github.com/cecil777/infrastructure/core/ioex"
 )
 
 type ioDirectory struct {

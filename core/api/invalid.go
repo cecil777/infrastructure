@@ -1,6 +1,6 @@
 package api
 
-import "core/errorex"
+import "github.com/cecil777/infrastructure/core/errorex"
 
 // invalidAPI is 禁用(空)的API
 type invalidAPI struct {

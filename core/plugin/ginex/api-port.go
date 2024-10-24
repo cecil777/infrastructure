@@ -1,12 +1,12 @@
 package ginex
 
 import (
-	"core/api"
-	"core/errorex"
 	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/cecil777/infrastructure/core/api"
+	"github.com/cecil777/infrastructure/core/errorex"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )

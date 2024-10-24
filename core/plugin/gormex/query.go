@@ -1,9 +1,10 @@
 package gormex
 
 import (
-	"core/db"
 	"fmt"
 	"gorm.io/gorm"
+
+	"github.com/cecil777/infrastructure/core/db"
 )
 
 type query struct {
