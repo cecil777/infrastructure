@@ -32,6 +32,7 @@ func TestRepositorySave(t *testing.T) {
 	c := conn.Db(first)
 	first.Name = "repository save test"
 	err := c.Add(&first)
+	assert.NoError(t, err)
 	first.Name = "repository update test"
 	err = c.Save(&first)
 	assert.NoError(t, err)
@@ -45,6 +46,7 @@ func TestRepositoryRemove(t *testing.T) {
 	c := conn.Db(first)
 	first.Name = "repository remove test"
 	err := c.Add(&first)
+	assert.NoError(t, err)
 	assert.NotEqual(t, first.ID, uint(0))
 	err = c.Remove(&first)
 	assert.NoError(t, err)
@@ -63,6 +65,7 @@ func TestUowRepositoryAdd(t *testing.T) {
 	assert.Equal(t, first.ID, uint(0))
 	first.Name = "repository uow update test"
 	err = c.Save(&first)
+	assert.NoError(t, err)
 	err = uow.Commit()
 	assert.NoError(t, err)
 	assert.NotEqual(t, first.ID, uint(0))
@@ -76,6 +79,7 @@ func TestUowRepositorySave(t *testing.T) {
 	c := conn.Db(first)
 	first.Name = "repository uow save test"
 	err := c.Add(&first)
+	assert.NoError(t, err)
 	updatedAt := first.UpdatedAt
 	uow := conn.Uow()
 	cc := conn.Db(first, uow)
@@ -97,6 +101,7 @@ func TestUowRepositoryRemove(t *testing.T) {
 	c := conn.Db(first, uow)
 	first.Name = "repository uow remove test"
 	err := c.Add(&first)
+	assert.NoError(t, err)
 	err = c.Remove(&first)
 	assert.NoError(t, err)
 	assert.False(t, first.DeletedAt.Valid)

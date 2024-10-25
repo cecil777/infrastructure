@@ -14,6 +14,7 @@ func TestUnitOfWork(t *testing.T) {
 	c := conn.Db(first)
 	first.Name = "uow test 1"
 	err := c.Add(&first)
+	assert.NoError(t, err)
 	two := Test{}
 	two.Name = "uow test 2"
 	err = c.Add(&two)
@@ -42,11 +43,13 @@ func TestUnitOfWork(t *testing.T) {
 	assert.False(t, two.DeletedAt.Valid)
 	//事务提交
 	err = uow.Commit()
+	assert.NoError(t, err)
 	//断言name、updated_at变更
 	assert.Equal(t, first.Name, "uow update test 1")
 	assert.NotEqual(t, first.UpdatedAt, updatedAt)
 	assert.True(t, two.DeletedAt.Valid)
 	count, err := conn.Db(Test{}).Query().Count()
+	assert.NoError(t, err)
 	//断言匹配
 	assert.Equal(t, count, int64(2))
 }
