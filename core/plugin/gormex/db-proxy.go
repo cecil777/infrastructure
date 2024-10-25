@@ -1,29 +1,25 @@
 package gormex
 
 import (
-	"log"
-
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/utils/tests"
 )
 
 type dbProxy struct {
-	dns string
-	db  *gorm.DB
+	db    *gorm.DB
+	drive gorm.Dialector
 }
 
 func (s *dbProxy) getDb() (*gorm.DB, error) {
 	if s.db == nil {
 		var d *gorm.DB
 		var err error
-		if s.dns != "" {
-			d, err = gorm.Open(mysql.Open(s.dns), &gorm.Config{})
+		if s.drive != nil {
+			d, err = gorm.Open(s.drive, &gorm.Config{})
 		} else {
 			d, err = gorm.Open(tests.DummyDialector{}, nil)
 		}
 		if err != nil {
-			log.Fatal(err)
 			return nil, err
 		}
 		s.db = d

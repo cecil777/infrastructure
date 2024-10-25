@@ -5,9 +5,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/cecil777/infrastructure/core/db"
-
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	"github.com/cecil777/infrastructure/core/db"
 )
 
 type Test struct {
@@ -27,7 +28,8 @@ func (Test) TableName() string {
 }
 
 func NewMock() db.IFactory {
-	return NewFactory("root:root1234@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local")
+	drive := mysql.Open("root:root1234@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local")
+	return NewFactory(drive)
 }
 
 func DeleteMockTest(conn db.IFactory) {

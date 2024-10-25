@@ -8,7 +8,7 @@ import (
 
 func TestRepositoryQuery(t *testing.T) {
 	test := Test{}
-	g := NewFactory("")
+	g := NewFactory(nil)
 	_, ok := g.Db(test).Query().(*query)
 	assert.True(t, ok)
 }

@@ -2,14 +2,11 @@ package gormex
 
 import (
 	"github.com/cecil777/infrastructure/core/db"
+	"gorm.io/gorm"
 )
 
 type gormExFactory struct {
 	proxy dbProxy
-}
-
-func NewFactory(dns string) db.IFactory {
-	return &gormExFactory{proxy: dbProxy{dns: dns}}
 }
 
 func (s *gormExFactory) Db(entry db.IIdentity, extra ...interface{}) db.IRepository {
@@ -30,4 +27,8 @@ func (s *gormExFactory) Uow() db.IUnitOfWork {
 	return &uowRepository{
 		proxy: s.proxy,
 	}
+}
+
+func NewFactory(drive gorm.Dialector) db.IFactory {
+	return &gormExFactory{proxy: dbProxy{drive: drive}}
 }
