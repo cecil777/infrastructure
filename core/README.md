@@ -1,4 +1,16 @@
-# ![Version](https://img.shields.io/badge/version-0.0.2-green.svg)
+# ![Version](https://img.shields.io/badge/version-0.0.7-green.svg)
+
+**项目规范**
+
+所有项目目录均放在$GOPATH/src下,目录结构跟gitlab路径一致,例如: `https://gitlab.dev.daaokeji.com/infrastructure/core`, 目录结构如下:
+```
+$GOPATH
+  - src
+    - github.cecil777.com
+      - infrastructure
+        - core
+          - 项目文件
+```
 
 **编码规范**
 
@@ -83,5 +95,5 @@ func init() {}
 
 func privateMethodA() {}
 
-func privateMethodB() {}
+func priateMethodB() {}
 ```

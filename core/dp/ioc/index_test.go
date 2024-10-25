@@ -1,10 +1,11 @@
 package ioc
 
 import (
-	"core/reflectex"
 	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/cecil777/infrastructure/core/reflectex"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -19,6 +20,10 @@ func (m derive) Test() {
 	fmt.Println("set test")
 }
 
+type myTest struct {
+	One iInterface `inject:""`
+}
+
 func Test_Get(t *testing.T) {
 	defer func() {
 		assert.Nil(
@@ -30,8 +35,8 @@ func Test_Get(t *testing.T) {
 	ct := getInterfaceType(
 		(*iInterface)(nil),
 	)
-	typeOfInstance[ct] = 1
-	defer delete(typeOfInstance, ct)
+	instanceValues[ct] = reflect.ValueOf(1)
+	defer delete(instanceValues, ct)
 
 	res := Get(ct)
 	assert.Equal(t, res, 1)
@@ -61,12 +66,32 @@ func Test_Has(t *testing.T) {
 	ct := getInterfaceType(
 		(*iInterface)(nil),
 	)
-	typeOfInstance[ct] = 1
-	defer delete(typeOfInstance, ct)
+	instanceValues[ct] = reflect.ValueOf(1)
+	defer delete(instanceValues, ct)
 
 	assert.True(
 		t,
 		Has(ct),
+	)
+}
+
+func Test_Inject(t *testing.T) {
+	it := getInterfaceType(
+		(*iInterface)(nil),
+	)
+	instanceValues[it] = reflect.ValueOf(
+		new(derive),
+	)
+
+	var m myTest
+	Inject(&m, func(v reflect.Value) reflect.Value {
+		return v
+	})
+
+	assert.Equal(
+		t,
+		m.One,
+		instanceValues[it].Interface(),
 	)
 }
 
@@ -95,7 +120,7 @@ func Test_Set(t *testing.T) {
 	ct := reflectex.InterfaceTypeOf(
 		(*iInterface)(nil),
 	)
-	defer delete(typeOfInstance, ct)
+	defer delete(instanceValues, ct)
 
 	Set(
 		ct,
@@ -152,13 +177,13 @@ func Test_Set_对象(t *testing.T) {
 	}()
 
 	ct := reflectex.InterfaceTypeOf((*iInterface)(nil))
-	defer delete(typeOfInstance, ct)
+	defer delete(instanceValues, ct)
 
 	Set(
 		(*iInterface)(nil),
 		new(derive),
 	)
 
-	_, ok := typeOfInstance[ct]
+	_, ok := instanceValues[ct]
 	assert.True(t, ok)
 }

@@ -3,10 +3,13 @@ package ginex
 import (
 	"fmt"
 	"net/http"
+	"reflect"
 	"time"
 
 	"github.com/cecil777/infrastructure/core/api"
+	"github.com/cecil777/infrastructure/core/dp/ioc"
 	"github.com/cecil777/infrastructure/core/errorex"
+	"github.com/cecil777/infrastructure/core/runtimeex"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
@@ -17,9 +20,10 @@ type routeParam struct {
 }
 
 type apiPort struct {
-	port int
-	req  *http.Request
-	resp http.ResponseWriter
+	apiFactory api.IFactory
+	port       int
+	req        *http.Request
+	resp       http.ResponseWriter
 }
 
 func (m *apiPort) Listen() {
@@ -56,8 +60,16 @@ func (m *apiPort) Listen() {
 			ctx.JSON(http.StatusOK, resp)
 		}()
 
-		apiInstance := api.Build(rp.Endpoint, rp.API)
+		apiInstance := m.apiFactory.Build(rp.Endpoint, rp.API)
 		ctx.BindJSON(apiInstance)
+		ioc.Inject(apiInstance, func(v reflect.Value) reflect.Value {
+			if traceable, ok := v.Interface().(runtimeex.ITraceable); ok {
+				traceable.SetTraceID("")     // traceID注入
+				traceable.SetTraceSpanID("") // traceSpanID注入
+			}
+
+			return v
+		})
 		if err = validate.Struct(apiInstance); err != nil {
 			err = errorex.New(errorex.VerifyCode, "")
 			return
@@ -81,8 +93,9 @@ func (m *apiPort) Listen() {
 }
 
 // NewAPIPort is 创建gin端口实例
-func NewAPIPort(port int) api.IPort {
+func NewAPIPort(apiFactory api.IFactory, port int) api.IPort {
 	return &apiPort{
-		port: port,
+		apiFactory: apiFactory,
+		port:       port,
 	}
 }
