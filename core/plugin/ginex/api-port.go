@@ -20,16 +20,20 @@ type routeParam struct {
 }
 
 type apiPort struct {
-	apiFactory api.IFactory
-	port       int
-	req        *http.Request
-	resp       http.ResponseWriter
+	apiFactory      api.IFactory
+	port            int
+	req             *http.Request
+	resp            http.ResponseWriter
+	middlewareChain *gin.HandlersChain
 }
 
 func (m *apiPort) Listen() {
 	gin.SetMode(gin.ReleaseMode)
 	app := gin.New()
 	validate := validator.New()
+
+	app.Use(*m.middlewareChain...)
+
 	app.POST("/:endpoint/:api", func(ctx *gin.Context) {
 		var rp routeParam
 		ctx.ShouldBindUri(&rp)
@@ -93,9 +97,10 @@ func (m *apiPort) Listen() {
 }
 
 // NewAPIPort is 创建gin端口实例
-func NewAPIPort(apiFactory api.IFactory, port int) api.IPort {
+func NewAPIPort(apiFactory api.IFactory, port int, middlewareChain *gin.HandlersChain) api.IPort {
 	return &apiPort{
-		apiFactory: apiFactory,
-		port:       port,
+		apiFactory:      apiFactory,
+		port:            port,
+		middlewareChain: middlewareChain,
 	}
 }
