@@ -1,4 +1,4 @@
-# ![Version](https://img.shields.io/badge/version-0.0.7-green.svg)
+# ![Version](https://img.shields.io/badge/version-0.0.9-green.svg)
 
 **项目规范**
 
@@ -34,7 +34,7 @@ import (
 
 - go文件命名
 
-go文件名均为小写,单词与单词之间用`-`分割
+go文件名均为小写,单词与单词之间用`-`分割, 例如: `i-string-generator.go`
 
 - 包名
 
