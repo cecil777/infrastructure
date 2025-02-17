@@ -46,9 +46,9 @@ func TestGenerateRegistry(t *testing.T) {
 
 package api
 import (
-    "gitlab.dev.daaokeji.com/infrastructure/core/api"
+    "github.com/cecil777/infrastructure/core/api"
     
-    "gitlab.dev.daaokeji.com/infrastructure/core/api/api/open"
+    "github.com/cecil777/infrastructure/core/api/api/open"
 )
 
 // Regsiter is 注册

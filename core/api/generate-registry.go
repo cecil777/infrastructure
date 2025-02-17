@@ -34,7 +34,7 @@ package api
 {{ $ProjectPath:=.ProjectPath -}}
 
 import (
-    "gitlab.dev.daaokeji.com/infrastructure/core/api"
+    "github.com/cecil777/infrastructure/core/api"
     {{range $k,$v:=.List}}
     "{{$ProjectPath}}/{{$v.Endpoint}}"
     {{- end}}
