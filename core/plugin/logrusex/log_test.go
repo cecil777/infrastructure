@@ -6,7 +6,7 @@ import (
 
 func TestInfo(t *testing.T) {
 	log := NewLog()
-	log.AddLabel("a", "test=%v, num1=%d, num2=%d, bool=%v", "test", 1, 3, true)
+	log.AddLabel("a", "test=%v, num1=%d, num2=%d, bool=%v", "test1", 1, 3, true)
 	log.Info()
 }
 
