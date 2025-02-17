@@ -6,8 +6,8 @@ import (
 )
 
 type stringGenerator struct {
-	len        int
-	sourceByte []byte
+	len        int    //生成长度
+	sourceByte []byte //源数据
 }
 
 func (s *stringGenerator) Generate() string {
