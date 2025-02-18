@@ -1,19 +1,17 @@
 package logrusex
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/cecil777/infrastructure/core/log"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/sirupsen/logrus"
 )
 
 type logAdapter struct {
-	labels map[string]string
-}
-
-type logFormat struct {
+	assertAction func(string)
+	labels       map[string]string
 }
 
 func (l *logAdapter) AddLabel(key, format string, v ...interface{}) log.ILog {
@@ -22,31 +20,39 @@ func (l *logAdapter) AddLabel(key, format string, v ...interface{}) log.ILog {
 }
 
 func (l *logAdapter) Debug() {
-	logrus.Debugln(mapToString(l.labels))
+	l.log(logrus.Debug)
 }
 
 func (l *logAdapter) Error() {
-	logrus.Error(mapToString(l.labels))
+	l.log(logrus.Error)
 }
 
 func (l *logAdapter) Fatal() {
-	logrus.Fatal(mapToString(l.labels))
+	l.log(logrus.Fatal)
 }
 
 func (l *logAdapter) Info() {
-	logrus.Info(mapToString(l.labels))
+	l.log(logrus.Info)
 }
 
 func (l *logAdapter) Warning() {
-	logrus.Warning(mapToString(l.labels))
+	l.log(logrus.Warning)
 }
 
-func mapToString(v interface{}) string {
-	marshal, err := json.Marshal(v)
+func (l *logAdapter) log(action func(args ...interface{})) {
+	marshal, err := jsoniter.MarshalToString(l.labels)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
-	return string(marshal)
+
+	if l.assertAction != nil {
+		l.assertAction(marshal)
+	} else {
+		action(marshal)
+	}
+}
+
+type logFormat struct {
 }
 
 func (s logFormat) Format(entry *logrus.Entry) ([]byte, error) {
@@ -54,7 +60,7 @@ func (s logFormat) Format(entry *logrus.Entry) ([]byte, error) {
 	return []byte(msg), nil
 }
 
-func NewLog() *logAdapter {
+func NewLog() log.ILog {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(new(logFormat))
 	return &logAdapter{
