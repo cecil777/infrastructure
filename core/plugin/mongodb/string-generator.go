@@ -1,15 +1,17 @@
 package mongodb
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"github.com/cecil777/infrastructure/core/object"
 
-type objectID2String struct {
-	objectId primitive.ObjectID
-}
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+type objectID2String struct{}
 
 func (o *objectID2String) Generate() string {
-	return o.objectId.Hex()
+	return primitive.NewObjectID().Hex()
 }
 
-func NewObjectID2String() *objectID2String {
+func NewStringGenerator() object.IStringGenerator {
 	return &objectID2String{}
 }

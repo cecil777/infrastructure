@@ -1,15 +1,16 @@
 package mongodb
 
 import (
-	"fmt"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestObjectID2String(t *testing.T) {
-	testStr := "测试ObjectID"
-	testStruct := NewObjectID2String()
-	testStruct.objectId, _ = primitive.ObjectIDFromHex(testStr)
-
-	fmt.Println(testStruct.Generate())
+	t.Run("生成2个", func(t *testing.T) {
+		generator := NewStringGenerator()
+		s1 := generator.Generate()
+		s2 := generator.Generate()
+		assert.NotEqual(t, s1, s2)
+	})
 }
