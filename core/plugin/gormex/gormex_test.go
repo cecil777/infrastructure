@@ -29,7 +29,7 @@ func (Test) TableName() string {
 
 func NewMock() db.IFactory {
 	drive := mysql.Open("root:root1234@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local")
-	return NewFactory(drive)
+	return NewFactory(nil, drive)
 }
 
 func DeleteMockTest(conn db.IFactory) {

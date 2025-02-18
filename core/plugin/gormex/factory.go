@@ -1,6 +1,8 @@
 package gormex
 
 import (
+	"context"
+
 	"github.com/cecil777/infrastructure/core/db"
 	"gorm.io/gorm"
 )
@@ -29,6 +31,6 @@ func (s *gormExFactory) Uow() db.IUnitOfWork {
 	}
 }
 
-func NewFactory(drive gorm.Dialector) db.IFactory {
-	return &gormExFactory{proxy: dbProxy{drive: drive}}
+func NewFactory(ctx context.Context, drive gorm.Dialector) db.IFactory {
+	return &gormExFactory{proxy: dbProxy{ctx: ctx, drive: drive}}
 }

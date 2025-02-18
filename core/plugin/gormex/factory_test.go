@@ -8,7 +8,7 @@ import (
 
 func TestFactoryDb(t *testing.T) {
 	test := Test{}
-	g := NewFactory(nil)
+	g := NewFactory(nil, nil)
 	gd := g.Db(test)
 	repo, ok := gd.(*repository)
 	assert.True(t, ok)
@@ -18,7 +18,7 @@ func TestFactoryDb(t *testing.T) {
 
 func TestFactoryUow(t *testing.T) {
 	test := Test{}
-	g := NewFactory(nil)
+	g := NewFactory(nil, nil)
 	uow := g.Uow()
 	_ = g.Db(test, uow)
 	u, ok := uow.(*uowRepository)
