@@ -12,6 +12,31 @@ $GOPATH
           - 项目文件
 ```
 
+**项目结构**
+```
+api           api目录
+  - bg        后台调用
+    ...
+  - h5        h5调用
+    ...
+  - inside    内部服务调用
+    ...
+  - mobile    移动端调用
+    ...
+  - open      第三方(开放)
+    ...
+model         模型
+  - enum      枚举
+    ...
+  - global    全局模型
+    ...
+service       服务(业务代码)
+  - contract  服务接口
+    ...
+  - xxxsvc    xxx服务
+    ...
+```
+
 **编码规范**
 
 - import
