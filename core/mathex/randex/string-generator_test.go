@@ -1,9 +1,10 @@
 package randex
 
 import (
+	"testing"
+
 	"github.com/cecil777/go-underscore"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestStringGenerator_Generate(t *testing.T) {
