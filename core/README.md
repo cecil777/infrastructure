@@ -97,3 +97,33 @@ func privateMethodA() {}
 
 func priateMethodB() {}
 ```
+
+- 单元测试
+
+文件格式: 文件名_test.go, 例如: redis.go/redis_test.go
+
+```
+type mathDemo struct { }
+
+func (m mathDemo) Add(a, b int) int {
+  return a + b
+}
+
+// 只测试一个场景
+func Test_mathDemo_Add(t *testing.T) {
+  res := (mathDemo{}).Add(1, 2)
+  assert.Equal(t, res, 3)
+}
+
+// 测试多个场景
+func Test_mathDemo_Add(t *testing.T) {
+  t.Run("正数", func (t *testing.T) {
+    res := (mathDemo{}).Add(1, 2)
+    assert.Equal(t, res, 3)
+  })
+  t.Run("负数", func (t *testing.T) {
+    res := (mathDemo{}).Add(-1, -2)
+    assert.Equal(t, res, -3)
+  })
+}
+```
