@@ -4,17 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/cecil777/infrastructure/core/runtimeex"
 	"github.com/valyala/fasthttp"
 )
-
-type SendTextBody struct {
-	MsgType string          `json:"msgtype"`
-	Text    sendTextContent `json:"text"`
-}
-
-type sendTextContent struct {
-	Content string `json:"content"`
-}
 
 type sendTextResp struct {
 	ErrCode int    `json:"errcode"`
@@ -25,23 +17,11 @@ type webhook struct {
 }
 
 func (w *webhook) Send(url, text string) error {
-	textContent := sendTextContent{
-		Content: text,
-	}
-	body := SendTextBody{
-		MsgType: "text",
-		Text:    textContent,
-	}
-	jsonBody, err := json.Marshal(body)
-	if err != nil {
-		return err
-	}
-
 	req := fasthttp.AcquireRequest()
 	defer fasthttp.ReleaseRequest(req)
 
 	req.SetRequestURI(url)
-	req.SetBody(jsonBody)
+	req.SetBody([]byte(text))
 	req.Header.SetContentType("application/json")
 	req.Header.SetMethod("POST")
 
@@ -53,7 +33,7 @@ func (w *webhook) Send(url, text string) error {
 	}
 
 	result := sendTextResp{}
-	err = json.Unmarshal(resp.Body(), &result)
+	err := json.Unmarshal(resp.Body(), &result)
 	if err != nil {
 		return err
 	}
@@ -64,6 +44,6 @@ func (w *webhook) Send(url, text string) error {
 	return nil
 }
 
-func NewWebhook() *webhook {
+func NewWebhook() runtimeex.IWebhook {
 	return &webhook{}
 }

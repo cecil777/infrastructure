@@ -15,8 +15,20 @@ func TestWebhook_Send(t *testing.T) {
 		{
 			name: "TestWebhook_Send",
 			args: args{
-				url:  "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=284cc574-7e21-4333-bb9f-6f87e0308529",
-				text: "企业微信机器人 hello world",
+				url: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=52204af2-4248-46ef-bd00-46ec0262772f",
+				text: `{
+					"msgtype": "news",
+					"news": {
+					   "articles" : [
+						   {
+							   "title" : "中秋节礼品领取",
+							   "description" : "今年中秋节公司有豪礼相送",
+							   "url" : "www.qq.com",
+							   "picurl" : "http://res.mail.qq.com/node/ww/wwopenmng/images/independent/doc/test_pic_msg1.png"
+						   }
+						]
+					}
+				}`,
 			},
 			wantErr: false,
 		},
