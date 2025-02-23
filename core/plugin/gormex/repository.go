@@ -1,9 +1,9 @@
 package gormex
 
 import (
-	"gorm.io/gorm"
-
 	"github.com/cecil777/infrastructure/core/db"
+
+	"gorm.io/gorm"
 )
 
 type repository struct {

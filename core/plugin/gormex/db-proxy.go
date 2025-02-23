@@ -6,7 +6,7 @@ import (
 	"github.com/opentracing/opentracing-go"
 	"gorm.io/gorm"
 	"gorm.io/gorm/utils/tests"
-	gormopentracing "gorm.io/plugin/opentracing"
+	gormOpenTracing "gorm.io/plugin/opentracing"
 )
 
 type dbProxy struct {
@@ -35,7 +35,7 @@ func (s *dbProxy) getDb() (*gorm.DB, error) {
 				tracer := s.ctx.Value("Tracer")
 				if engine, ok := tracer.(opentracing.Tracer); ok {
 					opentracing.SetGlobalTracer(engine)
-					err = d.Use(gormopentracing.New())
+					err = d.Use(gormOpenTracing.New())
 					if err != nil {
 						return nil, err
 					}
