@@ -32,6 +32,15 @@ func (r *redisAdapter) Get(str string) (string, error) {
 	return r.getClient().Get(str).Result()
 }
 
+func (r *redisAdapter) HSet(key, field, value string) (int, error) {
+	ok, err := r.getClient().HSet(key, field, value).Result()
+	if ok {
+		return 1, err
+	}
+
+	return 0, err
+}
+
 func (r *redisAdapter) Set(key, value string, extraArgs ...interface{}) (ok bool, err error) {
 	var res string
 	if len(extraArgs) == 0 {

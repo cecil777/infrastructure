@@ -8,6 +8,7 @@ type IRedis interface {
 	Del(...string) (int, error)
 	Exists(string) (bool, error)
 	Get(string) (string, error)
+	HSet(string, string, string) (int, error)
 	Set(string, string, ...interface{}) (bool, error)
 	Time() (time.Time, error)
 	TTL(key string) (time.Duration, error)
